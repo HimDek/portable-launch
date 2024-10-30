@@ -65,7 +65,7 @@ namespace portableLaunch
 
             if (saveDirs == "")
             {
-                Console.WriteLine("Launching \"" + startInfo.WorkingDirectory + "\\" + startInfo.FileName + "\"");
+                Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
                 Process.Start(startInfo)?.WaitForExit();
             }
             string[] saveDirsArray = saveDirs.Split(',').Select(sValue => sValue.Trim()).ToArray();
@@ -109,7 +109,7 @@ namespace portableLaunch
                 Directory.CreateSymbolicLink(path[1], saveRoot + path[0]);
             }
 
-            Console.WriteLine("Launching \"" + startInfo.WorkingDirectory + "\\" + startInfo.FileName + "\"");
+            Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
             Process.Start(startInfo)?.WaitForExit();
 
             for (int i = 0; i < saveDirsArray.Length; i++)
