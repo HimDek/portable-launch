@@ -157,12 +157,6 @@ namespace portableLaunch
             {
                 List<String> options = [.. Directory.GetFiles(dir, "*.ini")];
 
-                if (options.Count <= 0)
-                {
-                    Console.WriteLine("No ini files found in " + dir);
-                    return "";
-                }
-
                 for (int i = 0; i < options.Count; i++)
                 {
                     Ini ini = new(options[i]);
@@ -174,6 +168,12 @@ namespace portableLaunch
                     {
                         options.RemoveAt(i);
                     }
+                }
+
+                if (options.Count <= 0)
+                {
+                    Console.WriteLine("No ini files found in " + dir);
+                    return "";
                 }
 
                 int currentSelection = 0;
