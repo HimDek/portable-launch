@@ -52,8 +52,8 @@ namespace portableLaunch
 
             Ini ini = new(inifile);
 
-            String launchDir = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim());
-            String saveRoot = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim());
+            String launchDir = Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim();
+            String saveRoot = Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim();
             String saveDirs = Environment.ExpandEnvironmentVariables(ini.Read("saveDirs", "general")).Trim();
             String exe = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("exe", "general")).Trim());
 
@@ -73,6 +73,9 @@ namespace portableLaunch
                 else
                     launchDir = ".";
             }
+
+            saveRoot = Path.GetFullPath(saveRoot);
+            launchDir = Path.GetFullPath(launchDir);
 
             Console.WriteLine("saveDirs: \"" + saveDirs + "\"");
             Console.WriteLine("launchDir: \"" + launchDir + "\"");
