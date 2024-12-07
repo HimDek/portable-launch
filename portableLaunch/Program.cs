@@ -64,10 +64,15 @@ namespace portableLaunch
             }
 
             if (saveRoot == "")
-                saveRoot = "save";
+                saveRoot = "portable\\saves\\" + Path.GetFileNameWithoutExtension(inifile);
 
             if (launchDir == "")
-                launchDir = ".";
+            {
+                if (File.Exists(exe))
+                    launchDir = Path.GetDirectoryName(exe)!;
+                else
+                    launchDir = ".";
+            }
 
             Console.WriteLine("saveDirs: \"" + saveDirs + "\"");
             Console.WriteLine("launchDir: \"" + launchDir + "\"");
