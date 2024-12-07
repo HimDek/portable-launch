@@ -176,7 +176,7 @@ namespace portableLaunch
 
                     if (exe == "" || !File.Exists(exe))
                     {
-                        options.RemoveAt(i);
+                        options.RemoveAt(i--);
                     }
                 }
 
