@@ -203,12 +203,12 @@ namespace portableLaunch
                         if (i == currentSelection)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"> {Path.GetFileName(options[i])}");
+                            Console.WriteLine($"> {Path.GetFileNameWithoutExtension(options[i])}");
                             Console.ResetColor();
                         }
                         else
                         {
-                            Console.WriteLine($"  {Path.GetFileName(options[i])}");
+                            Console.WriteLine($"  {Path.GetFileNameWithoutExtension(options[i])}");
                         }
                     }
 
