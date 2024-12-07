@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 
 namespace portableLaunch
 {
@@ -45,6 +46,9 @@ namespace portableLaunch
             }
 
             Console.WriteLine("Reading \"" + inifile + "\"");
+
+            String? directory = Path.GetDirectoryName(Path.GetFullPath(inifile));
+            Directory.SetCurrentDirectory(directory!);
 
             Ini ini = new(inifile);
 
@@ -155,6 +159,7 @@ namespace portableLaunch
         {
             if (Directory.Exists(dir))
             {
+                Directory.SetCurrentDirectory(dir);
                 List<String> options = [.. Directory.GetFiles(dir, "*.ini")];
 
                 for (int i = 0; i < options.Count; i++)
@@ -189,12 +194,12 @@ namespace portableLaunch
                         if (i == currentSelection)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"> {Path.GetFileName(options[i])}");
+                            Console.WriteLine($"> {options[i]}");
                             Console.ResetColor();
                         }
                         else
                         {
-                            Console.WriteLine($"  {Path.GetFileName(options[i])}");
+                            Console.WriteLine($"  {options[i]}");
                         }
                     }
 
