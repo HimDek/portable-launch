@@ -160,7 +160,7 @@ namespace portableLaunch
             if (Directory.Exists(dir))
             {
                 Directory.SetCurrentDirectory(dir);
-                List<String> options = [.. Directory.GetFiles(dir, "*.ini")];
+                List<String> options = [.. Directory.GetFiles(".\\", "*.ini")];
 
                 for (int i = 0; i < options.Count; i++)
                 {
