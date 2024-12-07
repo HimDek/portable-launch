@@ -212,8 +212,7 @@ namespace portableLaunch
                     else if (key.Key == ConsoleKey.Enter)
                     {
                         Console.Clear();
-                        Console.WriteLine($"You selected: {options[currentSelection]}");
-                        break;
+                        return options[currentSelection];
                     }
                 }
             }
