@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 
 namespace portableLaunch
 {
@@ -8,26 +7,51 @@ namespace portableLaunch
         static int Main(string[] args)
         {
             String inifile = "";
-
-            if (args.Length >= 1)
-                inifile = Environment.ExpandEnvironmentVariables(args[0]).Trim();
+            String arg = "";
+            
+            if (args.Length >= 1) {
+                arg = Environment.ExpandEnvironmentVariables(args[0]).Trim();
+                if (File.Exists(arg))
+                    inifile = arg;
+                else if (Directory.Exists(arg))
+                    inifile = IniSelector(arg);
+                else
+                {
+                    Console.WriteLine(arg + "not found.");
+                    return 1;
+                }
+            }
+            else {
+                if (Directory.Exists(Environment.ExpandEnvironmentVariables("portable").Trim()))
+                    inifile = IniSelector(Environment.ExpandEnvironmentVariables("portable").Trim());
+                else if (File.Exists(Environment.ExpandEnvironmentVariables("portable.ini").Trim()))
+                    inifile = Environment.ExpandEnvironmentVariables("portable.ini").Trim();
+                else
+                {
+                    Console.WriteLine("No portable file or folder found.");
+                    return 1;
+                }
+            }
 
             if (inifile == "")
-                inifile = Environment.ExpandEnvironmentVariables("portable.ini").Trim();
-
-            if (!File.Exists(inifile))
             {
-                Console.WriteLine("File \"" + inifile + "\" not found");
+                Console.WriteLine("No ini file selected.");
                 return 1;
             }
+
+            if (!File.Exists(inifile)) {
+                Console.WriteLine("Error: \"" + inifile + "\" not found.");
+                return 1;
+            }
+
             Console.WriteLine("Reading \"" + inifile + "\"");
 
             Ini ini = new(inifile);
 
-            String launchDir = Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim();
-            String saveRoot = Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim();
+            String launchDir = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim());
+            String saveRoot = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim());
             String saveDirs = Environment.ExpandEnvironmentVariables(ini.Read("saveDirs", "general")).Trim();
-            String exe = Environment.ExpandEnvironmentVariables(ini.Read("exe", "general")).Trim();
+            String exe = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("exe", "general")).Trim());
 
             if (exe == "")
             {
@@ -89,7 +113,7 @@ namespace portableLaunch
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
-                
+
                 if (Directory.Exists(path[1]))
                 {
                     if (Directory.Exists(path[1] + ".bak"))
@@ -99,13 +123,13 @@ namespace portableLaunch
                 }
 
                 Console.WriteLine("Creating symlink \"" + path[1] + "\" to \"" + saveRoot + path[0] + "\"");
-                
+
                 var parent = Directory.GetParent(path[1])?.FullName;
                 if (parent != null && !Directory.Exists(parent))
                 {
                     Directory.CreateDirectory(parent);
                 }
-                
+
                 Directory.CreateSymbolicLink(path[1], saveRoot + path[0]);
             }
 
@@ -125,6 +149,69 @@ namespace portableLaunch
             }
 
             return 0;
+        }
+
+        static String IniSelector(String dir)
+        {
+            if (Directory.Exists(dir))
+            {
+                List<String> options = [.. Directory.GetFiles(dir, "*.ini")];
+
+                for (int i = 0; i < options.Count; i++)
+                {
+                    Ini ini = new(options[i]);
+                    ini.Read("exe", "general");
+
+                    String exe = ini.Read("exe", "general");
+
+                    if (exe == "" || !File.Exists(exe))
+                    {
+                        options.RemoveAt(i);
+                    }
+                }
+
+                int currentSelection = 0;
+
+                while (true)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Use arrow keys to navigate and press Enter to select:");
+
+                    // Display options
+                    for (int i = 0; i < options.Count; i++)
+                    {
+                        if (i == currentSelection)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"> {Path.GetFileName(options[i])}");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  {Path.GetFileName(options[i])}");
+                        }
+                    }
+
+                    // Capture key press
+                    var key = Console.ReadKey(true);
+
+                    if (key.Key == ConsoleKey.UpArrow)
+                    {
+                        currentSelection = (currentSelection == 0) ? options.Count - 1 : currentSelection - 1;
+                    }
+                    else if (key.Key == ConsoleKey.DownArrow)
+                    {
+                        currentSelection = (currentSelection == options.Count - 1) ? 0 : currentSelection + 1;
+                    }
+                    else if (key.Key == ConsoleKey.Enter)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"You selected: {options[currentSelection]}");
+                        break;
+                    }
+                }
+            }
+            return "";
         }
     }
 }
