@@ -77,6 +77,7 @@ namespace portableLaunch
             saveRoot = Path.GetFullPath(saveRoot);
             launchDir = Path.GetFullPath(launchDir);
 
+            Console.WriteLine("saveRoot: \"" + saveRoot + "\"");
             Console.WriteLine("saveDirs: \"" + saveDirs + "\"");
             Console.WriteLine("launchDir: \"" + launchDir + "\"");
             Console.WriteLine("exe: \"" + exe + "\"");
