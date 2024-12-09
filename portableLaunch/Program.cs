@@ -104,6 +104,7 @@ namespace portableLaunch
             {
                 Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
                 Process.Start(startInfo)?.WaitForExit();
+                return 0;
             }
             string[] saveDirsArray = saveDirs.Split(',').Select(sValue => sValue.Trim()).ToArray();
 
