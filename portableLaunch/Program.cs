@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
 
 namespace portableLaunch
 {
@@ -47,10 +46,10 @@ namespace portableLaunch
 
             Console.WriteLine("Reading \"" + inifile + "\"");
 
-            String? directory = Path.GetDirectoryName(Path.GetFullPath(inifile));
+            String directory = Path.GetDirectoryName(Path.GetFullPath(inifile));
             Directory.SetCurrentDirectory(directory!);
 
-            Ini ini = new(inifile);
+            Ini.Ini ini = new(inifile);
 
             String launchDir = Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim();
             String saveRoot = Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim();
@@ -178,7 +177,7 @@ namespace portableLaunch
 
                 for (int i = 0; i < options.Count; i++)
                 {
-                    Ini ini = new(options[i]);
+                    Ini.Ini ini = new(options[i]);
                     ini.Read("exe", "general");
 
                     String exe = ini.Read("exe", "general");
