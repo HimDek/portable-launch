@@ -118,7 +118,8 @@ namespace portableLaunch
 
                 for (int i = 0; i < saveDirsArray.Length; i++)
                 {
-                    string[] path = saveDirsArray[i].Split([':'], 2);
+                    char[] sep = { ':' };
+                    string[] path = saveDirsArray[i].Split(sep, 2);
                     if (Directory.Exists(path[1]))
                     {
                         Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + saveRoot + path[0] + "\"");
@@ -173,7 +174,7 @@ namespace portableLaunch
             if (Directory.Exists(dir))
             {
                 Directory.SetCurrentDirectory(dir);
-                List<String> options = [.. Directory.GetFiles(".\\", "*.ini")];
+                List<String> options = Directory.GetFiles(".\\", "*.ini").ToList();
 
                 for (int i = 0; i < options.Count; i++)
                 {
