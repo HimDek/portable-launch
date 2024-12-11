@@ -39,6 +39,8 @@ namespace portableLaunch
                 return 1;
             }
 
+            inifile = Path.GetFullPath(inifile);
+
             if (!File.Exists(inifile)) {
                 Console.WriteLine("Error: \"" + inifile + "\" not found.");
                 return 1;
@@ -46,7 +48,7 @@ namespace portableLaunch
 
             Console.WriteLine("Reading \"" + inifile + "\"");
 
-            String directory = Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(Path.GetFullPath(inifile)));
+            String directory = Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(inifile));
             Directory.SetCurrentDirectory(directory!);
 
             Ini.Ini ini = new(inifile);
