@@ -167,10 +167,10 @@ namespace portableLaunch
             }
 
             Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
-            if (ini.Read("wait", "general") == "true")
-                Process.Start(startInfo)?.WaitForExit();
-            else
+            if (ini.Read("wait", "general") == "false")
                 Process.Start(startInfo);
+            else
+                Process.Start(startInfo)?.WaitForExit();
 
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
