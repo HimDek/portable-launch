@@ -108,6 +108,7 @@ namespace portableLaunch
                 Process.Start(startInfo)?.WaitForExit();
                 return 0;
             }
+
             string[] saveDirsArray = saveDirs.Split(',').Select(sValue => sValue.Trim()).ToArray();
 
             if (!Directory.Exists(saveRoot))
@@ -124,6 +125,11 @@ namespace portableLaunch
                         Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + saveRoot + path[0] + "\"");
                         Process.Start("xcopy.exe", "\"" + path[1] + "\"" + " \"" + saveRoot + path[0] + "\"")?.WaitForExit();
                     }
+                    else if (File.Exists(path[1]))
+                    {
+                        Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + saveRoot + path[0] + "\"");
+                        Process.Start("copy", "\"" + path[1] + "\"" + " \"" + saveRoot + path[0] + "\"")?.WaitForExit();
+                    }
                 }
             }
 
@@ -138,6 +144,13 @@ namespace portableLaunch
                     Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + path[1] + ".bak\"");
                     Directory.Move(path[1], path[1] + ".bak");
                 }
+                else if (File.Exists(path[1]))
+                {
+                    if (File.Exists(path[1] + ".bak"))
+                        File.Delete(path[1] + ".bak");
+                    Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + path[1] + ".bak\"");
+                    File.Move(path[1], path[1] + ".bak");
+                }
 
                 Console.WriteLine("Creating symlink \"" + path[1] + "\" to \"" + saveRoot + path[0] + "\"");
 
@@ -147,11 +160,17 @@ namespace portableLaunch
                     Directory.CreateDirectory(parent);
                 }
 
-                Directory.CreateSymbolicLink(path[1], saveRoot + path[0]);
+                if (Directory.Exists(saveRoot + path[0]))
+                    Directory.CreateSymbolicLink(Path.GetFullPath(path[1]), Path.GetFullPath(saveRoot + path[0]));
+                else if (File.Exists(saveRoot + path[0]))
+                    File.CreateSymbolicLink(Path.GetFullPath(path[1]), Path.GetFullPath(saveRoot + path[0]));
             }
 
             Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
-            Process.Start(startInfo)?.WaitForExit();
+            if (ini.Read("wait", "general") == "true")
+                Process.Start(startInfo)?.WaitForExit();
+            else
+                Process.Start(startInfo);
 
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
