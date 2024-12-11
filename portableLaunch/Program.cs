@@ -176,11 +176,24 @@ namespace portableLaunch
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
                 Console.WriteLine("Removing symlink \"" + path[1] + "\" to \"" + saveRoot + path[0] + "\"");
-                Directory.Delete(path[1]);
-                if (Directory.Exists(path[1] + ".bak"))
+
+                if (Directory.Exists(path[1]))
                 {
-                    Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + path[1] + ".bak\"");
-                    Directory.Move(path[1] + ".bak", path[1]);
+                    Directory.Delete(path[1]);
+                    if (Directory.Exists(path[1] + ".bak"))
+                    {
+                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + path[1] + ".bak\"");
+                        Directory.Move(path[1] + ".bak", path[1]);
+                    }
+                }
+                else if (File.Exists(path[1]))
+                {
+                    File.Delete(path[1]);
+                    if (File.Exists(path[1] + ".bak"))
+                    {
+                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + path[1] + ".bak\"");
+                        File.Move(path[1] + ".bak", path[1]);
+                    }
                 }
             }
 
