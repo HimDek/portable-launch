@@ -46,7 +46,7 @@ namespace portableLaunch
 
             Console.WriteLine("Reading \"" + inifile + "\"");
 
-            String directory = Path.GetDirectoryName(Path.GetFullPath(inifile));
+            String directory = Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(Path.GetFullPath(inifile)));
             Directory.SetCurrentDirectory(directory!);
 
             Ini.Ini ini = new(inifile);
@@ -54,7 +54,7 @@ namespace portableLaunch
             String launchDir = Environment.ExpandEnvironmentVariables(ini.Read("launchDir", "general")).Trim();
             String saveRoot = Environment.ExpandEnvironmentVariables(ini.Read("saveRoot", "general")).Trim();
             String saveDirs = Environment.ExpandEnvironmentVariables(ini.Read("saveDirs", "general")).Trim();
-            String exe = Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("exe", "general")).Trim());
+            String exe = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Environment.ExpandEnvironmentVariables(ini.Read("exe", "general")).Trim()));
 
             if (exe == "")
             {
@@ -73,8 +73,8 @@ namespace portableLaunch
                     launchDir = ".";
             }
 
-            saveRoot = Path.GetFullPath(saveRoot);
-            launchDir = Path.GetFullPath(launchDir);
+            saveRoot = Path.TrimEndingDirectorySeparator(Path.GetFullPath(saveRoot));
+            launchDir = Path.TrimEndingDirectorySeparator(Path.GetFullPath(launchDir));
 
             if (saveDirs != "")
             {
@@ -119,8 +119,10 @@ namespace portableLaunch
                 for (int i = 0; i < saveDirsArray.Length; i++)
                 {
                     string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
-                    path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
-                    path[1] = Path.GetFullPath(path[1]);
+                    path[0] = path[0].Substring(1);
+                    
+                    path[0] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(saveRoot, path[0])));
+                    path[1] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path[1]));
 
                     if (Directory.Exists(path[1]))
                     {
@@ -138,9 +140,9 @@ namespace portableLaunch
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
-                path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
-                path[1] = Path.GetFullPath(path[1]);
-                String backup = Path.GetFullPath(path[1] + ".bak");
+                path[0] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(saveRoot, path[0])));
+                path[1] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path[1]));
+                String backup = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path[1] + ".bak"));
 
                 if (Directory.Exists(path[1]))
                 {
@@ -180,9 +182,9 @@ namespace portableLaunch
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
-                path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
-                path[1] = Path.GetFullPath(path[1]);
-                String backup = Path.GetFullPath(path[1] + ".bak");
+                path[0] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(saveRoot, path[0])));
+                path[1] = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path[1]));
+                String backup = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path[1] + ".bak"));
 
                 Console.WriteLine("Removing symlink \"" + path[1] + "\" to \"" + path[0] + "\"");
 
