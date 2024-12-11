@@ -63,7 +63,7 @@ namespace portableLaunch
             }
 
             if (saveRoot == "")
-                saveRoot = "saves\\" + Path.GetFileNameWithoutExtension(inifile);
+                saveRoot =  Path.Combine("saves", Path.GetFileNameWithoutExtension(inifile));
 
             if (launchDir == "")
             {
@@ -144,8 +144,8 @@ namespace portableLaunch
 
                 if (Directory.Exists(path[1]))
                 {
-                    if (Directory.Exists(path[1] + ".bak"))
-                        Directory.Delete(path[1] + ".bak");
+                    if (Directory.Exists(backup))
+                        Directory.Delete(backup);
                     Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + backup + "\"");
                     Directory.Move(path[1], backup);
                 }
