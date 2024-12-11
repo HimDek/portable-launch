@@ -118,17 +118,19 @@ namespace portableLaunch
 
                 for (int i = 0; i < saveDirsArray.Length; i++)
                 {
-                    char[] sep = { ':' };
-                    string[] path = saveDirsArray[i].Split(sep, 2);
+                    string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
+                    path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
+                    path[1] = Path.GetFullPath(path[1]);
+
                     if (Directory.Exists(path[1]))
                     {
-                        Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + saveRoot + path[0] + "\"");
-                        Process.Start("xcopy.exe", "\"" + path[1] + "\"" + " \"" + saveRoot + path[0] + "\"")?.WaitForExit();
+                        Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + path[0] + "\"");
+                        Process.Start("xcopy.exe", "\"" + path[1] + "\"" + " \"" + path[0] + "\"")?.WaitForExit();
                     }
                     else if (File.Exists(path[1]))
                     {
-                        Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + saveRoot + path[0] + "\"");
-                        Process.Start("copy", "\"" + path[1] + "\"" + " \"" + saveRoot + path[0] + "\"")?.WaitForExit();
+                        Console.WriteLine("Copying local savedata from \"" + path[1] + "\" to portable save directory \"" + path[0] + "\"");
+                        Process.Start("copy", "\"" + path[1] + "\"" + " \"" + path[0] + "\"")?.WaitForExit();
                     }
                 }
             }
@@ -136,23 +138,26 @@ namespace portableLaunch
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
+                path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
+                path[1] = Path.GetFullPath(path[1]);
+                String backup = Path.GetFullPath(path[1] + ".bak");
 
                 if (Directory.Exists(path[1]))
                 {
                     if (Directory.Exists(path[1] + ".bak"))
                         Directory.Delete(path[1] + ".bak");
-                    Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + path[1] + ".bak\"");
-                    Directory.Move(path[1], path[1] + ".bak");
+                    Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + backup + "\"");
+                    Directory.Move(path[1], backup);
                 }
                 else if (File.Exists(path[1]))
                 {
-                    if (File.Exists(path[1] + ".bak"))
-                        File.Delete(path[1] + ".bak");
-                    Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + path[1] + ".bak\"");
-                    File.Move(path[1], path[1] + ".bak");
+                    if (File.Exists(backup))
+                        File.Delete(backup);
+                    Console.WriteLine("Backing up local savedata \"" + path[1] + "\" as \"" + backup + "\"");
+                    File.Move(path[1], backup);
                 }
 
-                Console.WriteLine("Creating symlink \"" + path[1] + "\" to \"" + saveRoot + path[0] + "\"");
+                Console.WriteLine("Creating symlink \"" + path[1] + "\" to \"" + path[0] + "\"");
 
                 var parent = Directory.GetParent(path[1])?.FullName;
                 if (parent != null && !Directory.Exists(parent))
@@ -160,10 +165,10 @@ namespace portableLaunch
                     Directory.CreateDirectory(parent);
                 }
 
-                if (Directory.Exists(saveRoot + path[0]))
-                    Directory.CreateSymbolicLink(Path.GetFullPath(path[1]), Path.GetFullPath(saveRoot + path[0]));
-                else if (File.Exists(saveRoot + path[0]))
-                    File.CreateSymbolicLink(Path.GetFullPath(path[1]), Path.GetFullPath(saveRoot + path[0]));
+                if (Directory.Exists(path[0]))
+                    Directory.CreateSymbolicLink(path[1], path[0]);
+                else if (File.Exists(path[0]))
+                    File.CreateSymbolicLink(path[1], path[0]);
             }
 
             Console.WriteLine("Launching \"" + startInfo.FileName + "\"");
@@ -175,24 +180,28 @@ namespace portableLaunch
             for (int i = 0; i < saveDirsArray.Length; i++)
             {
                 string[] path = saveDirsArray[i].Split(new[] { ':' }, 2);
-                Console.WriteLine("Removing symlink \"" + path[1] + "\" to \"" + saveRoot + path[0] + "\"");
+                path[0] = Path.GetFullPath(Path.Combine(saveRoot, path[0]));
+                path[1] = Path.GetFullPath(path[1]);
+                String backup = Path.GetFullPath(path[1] + ".bak");
+
+                Console.WriteLine("Removing symlink \"" + path[1] + "\" to \"" + path[0] + "\"");
 
                 if (Directory.Exists(path[1]))
                 {
                     Directory.Delete(path[1]);
-                    if (Directory.Exists(path[1] + ".bak"))
+                    if (Directory.Exists(backup))
                     {
-                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + path[1] + ".bak\"");
-                        Directory.Move(path[1] + ".bak", path[1]);
+                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + backup + "\"");
+                        Directory.Move(backup, path[1]);
                     }
                 }
                 else if (File.Exists(path[1]))
                 {
                     File.Delete(path[1]);
-                    if (File.Exists(path[1] + ".bak"))
+                    if (File.Exists(backup))
                     {
-                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + path[1] + ".bak\"");
-                        File.Move(path[1] + ".bak", path[1]);
+                        Console.WriteLine("Restoring backup local savedata \"" + path[1] + "\" from \"" + backup + "\"");
+                        File.Move(backup, path[1]);
                     }
                 }
             }
